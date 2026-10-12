@@ -1,0 +1,323 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>كشوف حسابات الموظفين</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap"><style>
+
+/* Layout: public name grid for employees; hidden manager desk (2026 gesture + owner check) controls which statements are published. */
+
+:root{
+
+  --navy:#0A2463;
+
+  --bg:#F2F5FB;
+
+  --surface:#FFFFFF;
+
+  --surface-2:#EAEFF8;
+
+  --fg:#101A33;
+
+  --muted:#5A6788;
+
+  --line:#D9E0EE;
+
+  --accent:#0A2463;
+
+  --accent-fg:#FFFFFF;
+
+  --link:#1457C7;
+
+  --ok:#17794B;
+
+  --ok-bg:#DDF3E8;
+
+  --warn:#8A5A00;
+
+  --warn-bg:#FCEFCF;
+
+  --bad:#A32A2A;
+
+  --bad-bg:#F9DEDE;
+
+  --wa:#1B8F4B;
+
+  --font-display:'Readex Pro','IBM Plex Sans Arabic',Tahoma,sans-serif;
+
+  --font-body:'IBM Plex Sans Arabic',Tahoma,'Segoe UI',sans-serif;
+
+}
+
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+
+  --bg:#0A1020;--surface:#111A30;--surface-2:#18233F;--fg:#E6ECFA;--muted:#9AA8C9;--line:#26335A;
+
+  --accent:#5B8DEF;--accent-fg:#07102A;--link:#8FB2FF;
+
+  --ok:#6FD3A2;--ok-bg:#12372A;--warn:#F2C26B;--warn-bg:#3A2D10;--bad:#F29A9A;--bad-bg:#3B1B1B;--wa:#37C06F;color-scheme:dark}}
+
+:root[data-theme="dark"]{
+
+  --bg:#0A1020;--surface:#111A30;--surface-2:#18233F;--fg:#E6ECFA;--muted:#9AA8C9;--line:#26335A;
+
+  --accent:#5B8DEF;--accent-fg:#07102A;--link:#8FB2FF;
+
+  --ok:#6FD3A2;--ok-bg:#12372A;--warn:#F2C26B;--warn-bg:#3A2D10;--bad:#F29A9A;--bad-bg:#3B1B1B;--wa:#37C06F;color-scheme:dark}
+
+
+
+*{box-sizing:border-box}
+
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.6;padding-inline:16px;padding-block:0 40px}
+
+.wrap{max-width:1180px;margin-inline:auto}
+
+button,input,textarea,select{font:inherit;color:inherit}
+
+:focus-visible{outline:3px solid var(--link);outline-offset:2px}
+
+.num{font-variant-numeric:tabular-nums}
+
+[hidden]{display:none!important}
+
+
+
+.top{background:var(--navy);color:#fff;margin-inline:-16px;padding:20px 16px 56px}
+
+.top .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+
+.top .brand{font-family:var(--font-display);font-weight:700;letter-spacing:.08em;font-size:.9rem;opacity:.85}
+
+.top h1{font-family:var(--font-display);font-size:1.5rem;margin:2px 0 0;font-weight:700;text-wrap:balance}
+
+.top p{margin:2px 0 0;opacity:.8;font-size:.9rem}
+
+.top .btns{display:flex;gap:8px;flex-wrap:wrap}
+
+.tbtn{border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;border-radius:10px;padding:7px 14px;cursor:pointer;font-size:.9rem}
+
+.tbtn.solid{background:#fff;color:var(--navy);border-color:#fff;font-weight:600}
+
+.pubmain{margin-top:-34px}
+
+.foot{margin-top:34px;text-align:center;font-size:.8rem;color:var(--muted)}
+
+.tap{cursor:default;user-select:none;-webkit-tap-highlight-color:transparent}
+
+
+
+.summary{margin-top:-52px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;box-shadow:0 8px 24px rgba(10,36,99,.10)}
+
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+
+.stat b{font-family:var(--font-display);font-size:1.3rem;font-weight:600}
+
+.stat em{font-style:normal;color:var(--muted);font-size:.85rem}
+
+.cash{grid-column:1/-1;border-top:1px solid var(--line);padding-top:16px;display:grid;grid-template-columns:minmax(200px,280px) 1fr;gap:16px;align-items:center}
+
+.cash label{display:block;color:var(--muted);font-size:.8rem;margin-bottom:4px}
+
+.field{width:100%;padding:9px 12px;border:1px solid var(--line);background:var(--bg);border-radius:8px}
+
+.gauge{height:12px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+
+.gauge i{display:block;height:100%;background:var(--ok);border-radius:99px;transition:width .35s}
+
+.gauge.over i{background:var(--bad)}
+
+.gauge-note{margin-top:6px;font-size:.9rem;font-weight:500}
+
+.gauge-note.ok{color:var(--ok)}.gauge-note.bad{color:var(--bad)}
+
+
+
+.pubbar{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;border-radius:12px;padding:12px 14px;background:var(--ok-bg);color:var(--ok)}
+
+.pubbar.dirty{background:var(--warn-bg);color:var(--warn)}
+
+.pubbar span{font-weight:500}
+
+.pubbar .btn{width:auto;padding-inline:16px}
+
+
+
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-block:20px 12px}
+
+.bar .search{flex:1 1 220px;min-width:0}
+
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+
+.chip{border:1px solid var(--line);background:var(--surface);padding:7px 14px;border-radius:999px;cursor:pointer;font-size:.9rem}
+
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+
+.ghost{border:1px solid var(--line);background:transparent;padding:7px 12px;border-radius:10px;cursor:pointer;font-size:.88rem;color:var(--link)}
+
+.hint{color:var(--muted);font-size:.85rem;margin:0 0 10px}
+
+
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0;transition:opacity .2s}
+
+.card.off{opacity:.62;border-style:dashed}
+
+.head{display:flex;gap:12px;align-items:center;min-width:0}
+
+.av{flex:none;width:44px;height:44px;border-radius:50%;background:var(--surface-2);color:var(--accent);display:grid;place-items:center;font-family:var(--font-display);font-weight:600}
+
+.who{min-width:0;flex:1}
+
+.who h3{margin:0;font-size:1.02rem;font-family:var(--font-display);font-weight:600;overflow-wrap:anywhere}
+
+.who span{color:var(--muted);font-size:.82rem;display:block}
+
+.pill{flex:none;font-size:.75rem;padding:3px 10px;border-radius:99px;font-weight:600;white-space:nowrap}
+
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+
+.pill.mute{background:var(--surface-2);color:var(--muted)}
+
+.net{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-block:1px solid var(--line);padding-block:10px}
+
+.net small{color:var(--muted)}
+
+.net b{font-family:var(--font-display);font-size:1.35rem}
+
+.net b em{font-style:normal;font-size:.8rem;font-weight:500;color:var(--muted);margin-inline-start:4px}
+
+.tag{font-size:.78rem;color:var(--warn);background:var(--warn-bg);border-radius:6px;padding:2px 8px;align-self:flex-start}
+
+.btn{border:1px solid var(--accent);background:transparent;color:var(--link);padding:9px 10px;border-radius:10px;cursor:pointer;font-weight:500;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0}
+
+.btn.main{background:var(--accent);color:var(--accent-fg)}
+
+.btn.wa{background:var(--wa);border-color:var(--wa);color:#fff}
+
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.9rem;cursor:pointer}
+
+.sw input{position:absolute;opacity:0;width:1px;height:1px}
+
+.track{flex:none;width:44px;height:24px;border-radius:99px;background:var(--bad);position:relative;transition:*background* .2s}
+
+.track::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:inset-inline-start .2s}
+
+.sw input:checked + .track{background:var(--ok)}
+
+.sw input:checked + .track::after{inset-inline-start:23px}
+
+.sw input:focus-visible + .track{outline:3px solid var(--link);outline-offset:2px}
+
+.sw input:disabled + .track{opacity:.45}
+
+.sw\.neutral .track{background:var(--line)}
+
+.sw\.neutral input:checked + .track{background:var(--link)}
+
+.notice{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:.86rem}
+
+.notice strong{display:block;margin-bottom:2px}
+
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-inline-end-color:transparent;animation:r .8s linear infinite;display:inline-block;vertical-align:-2px}
+
+@keyframes r{to{transform:rotate(360deg)}}
+
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0}
+
+
+
+.veil{position:fixed;inset:0;background:rgba(5,10,25,.55);display:grid;place-items:center;padding:16px;z-index:10}
+
+.sheet{background:var(--surface);border-radius:16px;width:min(560px,100%);max-height:calc(100% - 8px);overflow:auto;padding:22px;border:1px solid var(--line)}
+
+.doc-head{text-align:center;border-bottom:3px double var(--navy);padding-bottom:12px;margin-bottom:14px}
+
+.doc-head .brand{font-family:var(--font-display);font-weight:700;letter-spacing:.08em;color:var(--accent)}
+
+.doc-head div{font-size:.85rem;color:var(--muted)}
+
+.doc-head h2{margin:4px 0 0;font-family:var(--font-display);font-size:1.15rem}
+
+.info{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:14px}
+
+.info div{min-width:0}
+
+.info small{display:block;color:var(--muted);font-size:.75rem}
+
+.info b{font-weight:600;overflow-wrap:anywhere}
+
+.sub-title{font-family:var(--font-display);font-size:.95rem;margin:14px 0 6px}
+
+.tbl{overflow-x:auto}
+
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+
+th{background:var(--surface-2);text-align:right;padding:7px 8px;font-weight:600;font-size:.8rem}
+
+td{padding:7px 8px;border-bottom:1px solid var(--line)}
+
+td.v,th.v{text-align:left;white-space:nowrap}
+
+.neg{color:var(--bad)}.pos{color:var(--ok)}
+
+.netbox{display:flex;justify-content:space-between;gap:10px;background:var(--navy);color:#fff;border-radius:10px;padding:12px 14px;margin-top:14px;font-family:var(--font-display)}
+
+.docnote{margin-top:12px;font-size:.82rem;color:var(--muted);background:var(--surface-2);border-radius:8px;padding:8px 10px}
+
+.sigs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;text-align:center;font-size:.85rem}
+
+.sigs div{border-top:1px solid var(--line);padding-top:6px}
+
+.docfoot{margin-top:14px;text-align:center;font-size:.75rem;color:var(--muted)}
+
+.sheet .row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+
+.sheet .row .btn{flex:1 1 130px}
+
+.phone-row{margin-top:14px}
+
+.phone-row label,.fl label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:3px}
+
+.ltr{direction:ltr;text-align:left}
+
+.form h2{margin:0 0 12px;font-family:var(--font-display);font-size:1.15rem}
+
+.fl{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+
+.fl .full{grid-column:1/-1}
+
+.adj{display:grid;grid-template-columns:minmax(0,1fr) 62px 80px 62px 34px;gap:6px;margin-bottom:6px;align-items:center}
+
+.adj .field{padding:7px 8px;min-width:0}
+
+.x{border:1px solid var(--line);background:transparent;border-radius:8px;height:34px;cursor:pointer;color:var(--bad)}
+
+.toast{position:fixed;inset-inline:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));margin-inline:auto;max-width:440px;background:var(--navy);color:#fff;padding:11px 16px;border-radius:10px;font-size:.9rem;z-index:20;text-align:center}
+
+
+
+@media (max-width:900px){.summary{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+@media (max-width:760px){
+
+  .cash{grid-template-columns:1fr}
+
+  .adj{grid-template-columns:minmax(0,1fr) 56px 72px 56px 34px}
+
+}
+
+@media (max-width:520px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.btn.wa{background:var(--wa);color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center}.btn.disabled{opacity:.55;pointer-events:none;background:var(--surface-2);color:var(--muted);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;text-decoration:none}.pending{border-style:dashed}.pill.warn{background:var(--warn-bg);color:var(--warn)}.intro{margin:18px 0;color:var(--muted)}.counts{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.count{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px}.count b{color:var(--accent)}.card .btn{width:100%;text-align:center}@media(max-width:600px){.actions{grid-template-columns:1fr}}
+</style></head><body><div id="app" dir="rtl" lang="ar"><section id="pubv"><header class="top"><div class="wrap"><div><div class="brand">EG-ACADEMIES</div><h1>كشوف حسابات الموظفين</h1><p>افتح الكشف المطلوب أو أرسل رسالة جاهزة عبر واتساب</p></div></div></header><main class="wrap pubmain"><p class="intro">الكشوف المكتملة متاحة للفتح. سهيلة ونيجار سيُضاف رابط كل منهما بعد اكتمال الكشف.</p><div class="counts"><div class="count">كشوف جاهزة: <b>20</b></div><div class="count">قيد التجهيز: <b>2</b></div></div><div class="bar" style="margin-top:0"><input class="field search" id="pq" type="search" placeholder="ابحث باسم الموظف" aria-label="بحث بالاسم"></div><div class="grid" id="pgrid"><article class="card"><div class="head"><div class="av" aria-hidden="true">آد</div><div class="who"><h3>آدم أيمن</h3><span>الكشف رقم 1 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1Ck301h2OuoUS9bpQTDXq901b_021qH31/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201023699308?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%20%D8%A2%D8%AF%D9%85%20%D8%A3%D9%8A%D9%85%D9%86%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9%3A%20https%3A%2F%2Fdocs.google.com%2Fdocument%2Fd%2F1Ck301h2OuoUS9bpQTDXq901b_021qH31%2Fedit.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">أد</div><div class="who"><h3>أدهم محمد</h3><span>الكشف رقم 2 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1vS-OIlXTXR_ll5OBKb8cBFQlHOFbAnH5/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201222850465?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%20%D8%A3%D8%AF%D9%87%D9%85%20%D9%85%D8%AD%D9%85%D8%AF%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9%3A%20https%3A%2F%2Fdocs.google.com%2Fdocument%2Fd%2F1Ck301h2OuoUS9bpQTDXq901b_021qH31%2Fedit.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">آل</div><div class="who"><h3>آلاء عاطف</h3><span>الكشف رقم 3 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1syX4RTtChGvqNtf9l4IqJjCzTf3u4YS9/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201040187454?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D8%A2%D9%84%D8%A7%D8%A1%20%D8%B9%D8%A7%D8%B7%D9%81%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9%3A%20https%3A%2F%2Fdocs.google.com%2Fdocument%2Fd%2F1Ck301h2OuoUS9bpQTDXq901b_021qH31%2Fedit.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">أم</div><div class="who"><h3>أماني محمد</h3><span>الكشف رقم 4 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1GeCQi58fzj_tNtItbpym6FF_7lZ7buLt/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201276244363?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D8%A3%D9%85%D8%A7%D9%86%D9%8A%20%D9%85%D8%AD%D9%85%D8%AF%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">آي</div><div class="who"><h3>آية ماهر</h3><span>الكشف رقم 5 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1VholA0g7WqOLSBUPCwVWRlDbvtjwxh-i/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201280207280?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D8%A2%D9%8A%D8%A9%20%D9%85%D8%A7%D9%87%D8%B1%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">آي</div><div class="who"><h3>آية مختار</h3><span>الكشف رقم 6 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1TuRQYBrOoPQgE1y6HJL0JGp8uTNO3Y0n/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201007759730?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D8%A2%D9%8A%D8%A9%20%D9%85%D8%AE%D8%AA%D8%A7%D8%B1%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">جو</div><div class="who"><h3>جومانه أحمد</h3><span>الكشف رقم 7 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1yXH-H8NXN5Qm7loUF-WnAiGFs_tlYxxM/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201036546566?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D8%AC%D9%88%D9%85%D8%A7%D9%86%D9%87%20%D8%A3%D8%AD%D9%85%D8%AF%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">سم</div><div class="who"><h3>سميرة أحمد</h3><span>الكشف رقم 8 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/17U3BFyMLCC_uqGOKp5EDakqSnPl5WrJw/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201063439444?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D8%B3%D9%85%D9%8A%D8%B1%D8%A9%20%D8%A3%D8%AD%D9%85%D8%AF%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">سه</div><div class="who"><h3>سهام كرم</h3><span>الكشف رقم 9 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1Gcfqp6LQ2n2gmzg0koT7XDFPN1IgrDrC/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201555254564?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D8%B3%D9%87%D8%A7%D9%85%20%D9%83%D8%B1%D9%85%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">عل</div><div class="who"><h3>علياء محمد</h3><span>الكشف رقم 10 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1-jOXS6yOec1-Yyxv4qTx1npv8XMVCN8p/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201147181981?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D8%B9%D9%84%D9%8A%D8%A7%D8%A1%20%D9%85%D8%AD%D9%85%D8%AF%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">لي</div><div class="who"><h3>ليلى رأفت</h3><span>الكشف رقم 11 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1Bs24Ha1TRdBGaiSGIRCelqSrhn7UanJe/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201154508121?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D9%84%D9%8A%D9%84%D9%89%20%D8%B1%D8%A3%D9%81%D8%AA%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">مر</div><div class="who"><h3>مريم صابر</h3><span>الكشف رقم 12 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1F-e-8dnKG-5fgdcqQXznSsdGgA3a4McC/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201143920312?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D9%85%D8%B1%D9%8A%D9%85%20%D8%B5%D8%A7%D8%A8%D8%B1%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">مر</div><div class="who"><h3>مريم محمود</h3><span>الكشف رقم 13 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1RN1hDjvz4ZS8mhbzxIkkrhuW5IP-gMCf/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201285168116?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D9%85%D8%B1%D9%8A%D9%85%20%D9%85%D8%AD%D9%85%D9%88%D8%AF%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">مل</div><div class="who"><h3>ملك سامي</h3><span>الكشف رقم 14 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1fSuH1gBwLAXGFZxhDTzf0jxlO3RYwQGy/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201121070516?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D9%85%D9%84%D9%83%20%D8%B3%D8%A7%D9%85%D9%8A%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">من</div><div class="who"><h3>منار عصام</h3><span>الكشف رقم 15 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1vJs4lycbf7P255Dhk1TNYmIZwBHDI9L0/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201123305497?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D9%85%D9%86%D8%A7%D8%B1%20%D8%B9%D8%B5%D8%A7%D9%85%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">مي</div><div class="who"><h3>مي جودة</h3><span>الكشف رقم 16 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1GLXW3ITAarrTjBcITc4O41O0caST3p4y/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201064942414?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D9%85%D9%8A%20%D8%AC%D9%88%D8%AF%D8%A9%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">ند</div><div class="who"><h3>ندى ياسر</h3><span>الكشف رقم 17 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1tMtU0LUEXN7hXhbHjeE0hHax6wLU-lo3/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201029465750?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D9%86%D8%AF%D9%89%20%D9%8A%D8%A7%D8%B3%D8%B1%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">نو</div><div class="who"><h3>نور الدين</h3><span>الكشف رقم 18 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1SfQvAgT71IysH1i2-eXRwLsQvR2esdJL/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201557820171?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D9%86%D9%88%D8%B1%20%D8%A7%D9%84%D8%AF%D9%8A%D9%86%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">نو</div><div class="who"><h3>نور محمود</h3><span>الكشف رقم 19 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1GE8vOjmhnh9uCcuurpY8bk55gHZ2toyC/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201039864962?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D9%86%D9%88%D8%B1%20%D9%85%D8%AD%D9%85%D9%88%D8%AF%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card"><div class="head"><div class="av" aria-hidden="true">ها</div><div class="who"><h3>هاجر أحمد</h3><span>الكشف رقم 20 · مستند Google Docs</span></div><span class="pill ok">جاهز</span></div><div class="actions"><a class="btn main" href="https://docs.google.com/document/d/1p2cc8Fy_v3IhmHX_HD3eTrnwl4C5dSfO/edit" target="_blank" rel="noopener noreferrer">فتح الكشف</a><a class="btn wa" href="https://wa.me/201101258371?text=%D8%A3%D8%B3%D8%AA%D8%A7%D8%B0%D8%A9%20%D9%87%D8%A7%D8%AC%D8%B1%20%D8%A3%D8%AD%D9%85%D8%AF%D8%8C%20%D8%AA%D8%AD%D9%8A%D8%A9%20%D8%B7%D9%8A%D8%A8%D8%A9%D8%8C%20%D9%85%D8%B1%D9%81%D9%82%20%D9%84%D8%AD%D8%B6%D8%B1%D8%AA%D9%83%20%D8%B1%D8%A7%D8%A8%D8%B7%20%D9%83%D8%B4%D9%81%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D8%A8%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5%20%D8%A8%D9%83%20%D9%84%D9%84%D8%A7%D8%B7%D9%84%D8%A7%D8%B9%20%D8%B9%D9%84%D9%89%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D8%A9%20%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9.%20%D8%A8%D8%B1%D8%AC%D8%A7%D8%A1%20%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA%D8%8C%20%D9%88%D9%81%D9%8A%20%D8%AD%D8%A7%D9%84%20%D9%88%D8%AC%D9%88%D8%AF%20%D8%A3%D9%8A%20%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%A3%D9%88%20%D9%85%D9%84%D8%A7%D8%AD%D8%B8%D8%A9%20%D9%8A%D8%B1%D8%AC%D9%89%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84%20%D9%85%D8%B9%D9%86%D8%A7.%20%D9%85%D8%B9%20%D8%AE%D8%A7%D9%84%D8%B5%20%D8%A7%D9%84%D8%B4%D9%83%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D9%82%D8%AF%D9%8A%D8%B1." target="_blank" rel="noopener noreferrer">إرسال عبر واتساب</a></div></article><article class="card pending"><div class="head"><div class="av">س</div><div class="who"><h3>سهيلة</h3><span>سيتم إضافة الرابط بعد اكتمال الكشف</span></div><span class="pill warn">قيد التجهيز</span></div><button class="btn disabled" disabled>الكشف لم يكتمل</button></article><article class="card pending"><div class="head"><div class="av">ن</div><div class="who"><h3>نيجار</h3><span>سيتم إضافة الرابط بعد اكتمال الكشف</span></div><span class="pill warn">قيد التجهيز</span></div><button class="btn disabled" disabled>الكشف لم يكتمل</button></article></div><div class="foot">© 2026 إدارة الحسابات</div></main></section></div><script>const q=document.getElementById('pq');q.addEventListener('input',()=>{const s=q.value.trim();document.querySelectorAll('#pgrid .card').forEach(c=>c.hidden=!c.innerText.includes(s));});</script></body></html>
